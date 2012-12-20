@@ -37,16 +37,15 @@ you can see when you're working outside of the bounds of your
 expectations.
 
 . It's also relevant that by logging fsync, you don't necessarily
-invoke fsync again and again.  Think about these options
-(non-exclusive things to explore): 
-
+  invoke fsync again and again.  Think about these options
+  (non-exclusive things to explore): 
 [loweralpha]
-.. Log to syslog 
-.. Log to tempfs (less likely to block?)  
-.. Write to log periodically
-.. Write to log on signal
-.. Need to log time taken for fsync, as well as approximate overhead of
-    the library call.
+  .. Log to syslog 
+  .. Log to tempfs (less likely to block?)  
+  .. Write to log periodically
+  .. Write to log on signal
+  .. Need to log time taken for fsync, as well as approximate overhead of
+     the library call.
 
 . It costs extra time to do important things.
 [loweralpha]
