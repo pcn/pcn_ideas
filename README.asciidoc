@@ -94,4 +94,4 @@ Other interposition libraries
 
 a. http://dsc.sun.com/solaris/articles/lib_interposers.html (don't know if it's good yet).
 b. http://www.flamingspork.com/projects/libeatmydata/
-
+c. How-to: http://www.jayconrod.com/cgi/view_post.py?23
