@@ -4,7 +4,7 @@ pcn_ideas
 A place for random ideas that may one day become reality
 
 fsync_timing_interposition
-==========================
+--------------------------
 
 Had an interesting experience the other day.  ZooKeeper, which logs
 its fsync() completion time when it exceeds the timeout for its
@@ -33,11 +33,11 @@ So, I've thought about this and I've got a couple of thoughts:
  invoke fsync again and again.  Think about these options
  (non-exclusive things to explore): 
  
-   a. Log to syslog 
-   b. Log to tempfs (less likely to block?)  
-   c. Write to log periodically
-   d. Write to log on signal
-   e. Need to log time taken for fsync, as well as approximate overhead of
+   1. Log to syslog 
+   2. Log to tempfs (less likely to block?)  
+   3. Write to log periodically
+   4. Write to log on signal
+   5. Need to log time taken for fsync, as well as approximate overhead of
       the library call.
 
  3. It costs extra time to do important things.
