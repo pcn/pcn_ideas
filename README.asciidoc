@@ -6,6 +6,9 @@ A place for random ideas that may one day become reality
 fsync_timing_interposition
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
 
+Background 
+^^^^^^^^^^
+
 Had an interesting experience the other day.  ZooKeeper, which logs
 its fsync() completion time when it exceeds the timeout for its
 connected clients, reported that a fsync() had taken about 2 minutes.
@@ -14,41 +17,79 @@ This was useful because it led us to talk to AWS and get the instance
 checked out.  There were hardware errors that weren't automatically
 detected, and we had our answer as to the root cause of an error.
 
+Not everyone logs info about this
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
 This led to the idea that good code calls fsync() or its brethren.
 Because it's performance-critical, however, fsync is rarely
 instrumented, but there are times when really good tools like
 profilers, dtrace, etc. provide you with insight that you didn't
 otherwise have and you think "man, I'd like to have that".
 
-So, I've thought about this and I've got a couple of thoughts:
+The idea
+^^^^^^^^
 
- 1. What matters is that an application knows when it's fsync() is
- slow.  What does slow mean? Slow means slower than normal, so it only
- makes any sense when you have data over time.  So this means
- something that you'd preferrably keep running at all times so that
- you can see when you're working outside of the bounds of your
- expectations.
+1. What matters is that an application knows when it's fsync() is
+slow.  What does slow mean? Slow means slower than normal, so it only
+makes any sense when you have data over time.  So this means
+something that you'd preferrably keep running at all times so that
+you can see when you're working outside of the bounds of your
+expectations.
 
- 2. It's also relevant that by logging fsync, you don't necessarily
- invoke fsync again and again.  Think about these options
- (non-exclusive things to explore): 
- 
-  a. Log to syslog 
-  b. Log to tempfs (less likely to block?)  
-  c. Write to log periodically
-  d. Write to log on signal
-  e. Need to log time taken for fsync, as well as approximate overhead of
-     the library call.
+2. It's also relevant that by logging fsync, you don't necessarily
+invoke fsync again and again.  Think about these options
+(non-exclusive things to explore): 
 
- 3. It costs extra time to do important things.
-  a. like what the  filedes argument maps to.
-  b. Need to find the current name of file in a process.
-  c. Need to store file->write time.
-  d. Should store overall time spent per write interval per file.
-     E.g. use a hash map (http://code.google.com/p/sparsehash/?redir=1 maybe?)
-     and a linked list of structs. The hash map is useful to 
-     limit the space used.  The latter gives raw data.    
- 
- 4. Look at other examples.  http://dsc.sun.com/solaris/articles/lib_interposers.html
+ a. Log to syslog 
+ b. Log to tempfs (less likely to block?)  
+ c. Write to log periodically
+ d. Write to log on signal
+ e. Need to log time taken for fsync, as well as approximate overhead of
+    the library call.
+
+3. It costs extra time to do important things.
+ a. like what the  filedes argument maps to.
+ b. Need to find the current name of file in a process.
+ c. Need to store file->write time.
+ d. Should store overall time spent per write interval per file.
+    E.g. use a hash map (http://code.google.com/p/sparsehash/?redir=1 maybe?)
+    and a linked list of structs. The hash map is useful to 
+    limit the space used.  The latter gives raw data.    
+
+4. Look at good examples of these.
+ a. http://dsc.sun.com/solaris/articles/lib_interposers.html (don't know if it's good yet).
+
+5. Need to have ways to specify desired behavior.  
+ a. It's dicey to e.g. use signals (is the actual program going to use the same
+   signal?) 
+ b. using the environment is probably the right way to 
+   e.g. specify output file format.
+ c. File rotation.
+
+Limitations
+^^^^^^^^^^^
+
+If you don't call fsync(), sync(), fdatasync(), etc. you're still
+going to end up writing to disk and blocking based on system
+heuristics (every 10 seconds, maybe every 30 seconds, or any time that
+the count of dirty buffers exceeds some percentage of memory).
+
+Once data is actually being written to disk, other calls, e.g. write()
+or maybe read() types of calls will get slow, and an interposition
+library doesn't have any insight into this.
+
+Why not...
+^^^^^^^^^^
+
+Other ways to skin this cat:
+
+1. DTrace.  But we're not running on solariss, macos x, or freebsd.
+   Much better in many ways, can turn it on and off, get histograms,
+   etc.)
+
+2. Put the code in the program.  Better and better but if you e.g.
+   don't write the program (it'd be interesting to see if this could 
+   be used for e.g. cassandra) this is still useful.  Also, we don't
+   write in C.  Harder to have a timing library like this.
 
  
