@@ -56,10 +56,7 @@ invoke fsync again and again.  Think about these options
     and a linked list of structs. The hash map is useful to 
     limit the space used.  The latter gives raw data.    
 
-4. Look at good examples of these.
- a. http://dsc.sun.com/solaris/articles/lib_interposers.html (don't know if it's good yet).
-
-5. Need to have ways to specify desired behavior.  
+4. Need to have ways to specify desired behavior.  
  a. It's dicey to e.g. use signals (is the actual program going to use the same
    signal?) 
  b. using the environment is probably the right way to 
@@ -92,4 +89,9 @@ Other ways to skin this cat:
    be used for e.g. cassandra) this is still useful.  Also, we don't
    write in C.  Harder to have a timing library like this.
 
- 
+Other interposition libraries
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+a. http://dsc.sun.com/solaris/articles/lib_interposers.html (don't know if it's good yet).
+b. http://www.flamingspork.com/projects/libeatmydata/
+
