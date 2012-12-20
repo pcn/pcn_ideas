@@ -29,39 +29,42 @@ otherwise have and you think "man, I'd like to have that".
 The idea
 ^^^^^^^^
 
-1. What matters is that an application knows when it's fsync() is
+. What matters is that an application knows when it's fsync() is
 slow.  What does slow mean? Slow means slower than normal, so it only
 makes any sense when you have data over time.  So this means
 something that you'd preferrably keep running at all times so that
 you can see when you're working outside of the bounds of your
 expectations.
 
-2. It's also relevant that by logging fsync, you don't necessarily
+. It's also relevant that by logging fsync, you don't necessarily
 invoke fsync again and again.  Think about these options
 (non-exclusive things to explore): 
 
- .. Log to syslog 
- .. Log to tempfs (less likely to block?)  
- .. Write to log periodically
- .. Write to log on signal
- .. Need to log time taken for fsync, as well as approximate overhead of
+[loweralpha]
+.. Log to syslog 
+.. Log to tempfs (less likely to block?)  
+.. Write to log periodically
+.. Write to log on signal
+.. Need to log time taken for fsync, as well as approximate overhead of
     the library call.
 
-3. It costs extra time to do important things.
- .. like what the  filedes argument maps to.
- .. Need to find the current name of file in a process.
- .. Need to store file->write time.
- .. Should store overall time spent per write interval per file.
-    E.g. use a hash map (http://code.google.com/p/sparsehash/?redir=1 maybe?)
-    and a linked list of structs. The hash map is useful to 
-    limit the space used.  The latter gives raw data.    
+. It costs extra time to do important things.
+[loweralpha]
+.. like what the  filedes argument maps to.
+.. Need to find the current name of file in a process.
+.. Need to store file->write time.
+.. Should store overall time spent per write interval per file.
+   E.g. use a hash map (http://code.google.com/p/sparsehash/?redir=1 maybe?)
+   and a linked list of structs. The hash map is useful to 
+   limit the space used.  The latter gives raw data.    
 
-4. Need to have ways to specify desired behavior.  
- .. It's dicey to e.g. use signals (is the actual program going to use the same
+. Need to have ways to specify desired behavior.  
+[loweralpha]
+.. It's dicey to e.g. use signals (is the actual program going to use the same
    signal?) 
- .. using the environment is probably the right way to 
+.. using the environment is probably the right way to 
    e.g. specify output file format.
- .. File rotation.
+.. File rotation.
 
 Limitations
 ^^^^^^^^^^^
@@ -80,11 +83,11 @@ Why not...
 
 Other ways to skin this cat:
 
-1. DTrace.  But we're not running on solariss, macos x, or freebsd.
+. DTrace.  But we're not running on solariss, macos x, or freebsd.
    Much better in many ways, can turn it on and off, get histograms,
    etc.)
 
-2. Put the code in the program.  Better and better but if you e.g.
+. Put the code in the program.  Better and better but if you e.g.
    don't write the program (it'd be interesting to see if this could 
    be used for e.g. cassandra) this is still useful.  Also, we don't
    write in C.  Harder to have a timing library like this.
@@ -92,6 +95,7 @@ Other ways to skin this cat:
 Other interposition libraries
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-a. http://dsc.sun.com/solaris/articles/lib_interposers.html (don't know if it's good yet).
-b. http://www.flamingspork.com/projects/libeatmydata/
-c. How-to: http://www.jayconrod.com/cgi/view_post.py?23
+[loweralpha]
+. http://dsc.sun.com/solaris/articles/lib_interposers.html (don't know if it's good yet).
+. http://www.flamingspork.com/projects/libeatmydata/
+. How-to: http://www.jayconrod.com/cgi/view_post.py?23
